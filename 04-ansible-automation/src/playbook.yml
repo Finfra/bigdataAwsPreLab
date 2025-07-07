@@ -1,0 +1,128 @@
+# playbook.yml
+---
+- name: Setup Hadoop and Spark Cluster
+  hosts: hadoop_cluster
+  become: yes
+  vars:
+    hadoop_version: 3.3.1
+    spark_version: 3.2.1
+    java_version: 1.8.0-openjdk-devel
+
+  tasks:
+    - name: Update all packages
+      dnf:
+        name: '*'
+        state: latest
+
+    - name: Install Java
+      dnf:
+        name: "{{ java_version }}"
+        state: present
+
+    - name: Create /opt directory if it does not exist
+      file:
+        path: /opt
+        state: directory
+        mode: '0755'
+
+    - name: Download and unarchive Hadoop
+      unarchive:
+        src: "https://archive.apache.org/dist/hadoop/common/hadoop-{{ hadoop_version }}/hadoop-{{ hadoop_version }}.tar.gz"
+        dest: /opt/
+        remote_src: yes
+        creates: "/opt/hadoop-{{ hadoop_version }}"
+
+    - name: Create symlink for Hadoop
+      file:
+        src: "/opt/hadoop-{{ hadoop_version }}"
+        dest: /opt/hadoop
+        state: link
+
+    - name: Download and unarchive Spark
+      unarchive:
+        src: "https://archive.apache.org/dist/spark/spark-{{ spark_version }}/spark-{{ spark_version }}-bin-hadoop3.2.tgz"
+        dest: /opt/
+        remote_src: yes
+        creates: "/opt/spark-{{ spark_version }}-bin-hadoop3.2"
+
+    - name: Create symlink for Spark
+      file:
+        src: "/opt/spark-{{ spark_version }}-bin-hadoop3.2"
+        dest: /opt/spark
+        state: link
+
+    - name: Set JAVA_HOME in /etc/profile.d/java.sh
+      block:
+        - name: Ensure /etc/profile.d directory exists
+          file:
+            path: /etc/profile.d
+            state: directory
+            mode: '0755'
+
+        - name: Add JAVA_HOME to /etc/profile.d/java.sh
+          lineinfile:
+            path: /etc/profile.d/java.sh
+            line: "export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk"
+            create: yes
+            mode: '0644'
+
+    - name: Add Hadoop and Spark to PATH in /etc/profile.d/bigdata.sh
+      block:
+        - name: Ensure /etc/profile.d directory exists
+          file:
+            path: /etc/profile.d
+            state: directory
+            mode: '0755'
+
+        - name: Add Hadoop and Spark to PATH
+          lineinfile:
+            path: /etc/profile.d/bigdata.sh
+            line: "export PATH=$PATH:/opt/hadoop/bin:/opt/hadoop/sbin:/opt/spark/bin:/opt/spark/sbin"
+            create: yes
+            mode: '0644'
+
+    - name: Create HDFS data directories
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: ec2-user
+        group: ec2-user
+        mode: '0755'
+      with_items:
+        - /data/hadoop/hdfs/namenode
+        - /data/hadoop/hdfs/datanode
+
+    - name: Create Spark logs directory
+      file:
+        path: /opt/spark/logs
+        state: directory
+        owner: ec2-user
+        group: ec2-user
+        mode: '0755'
+
+    - name: Distribute Hadoop configuration files
+      template:
+        src: "{{ item }}.j2"
+        dest: "/opt/hadoop/etc/hadoop/{{ item }}"
+      with_items:
+        - core-site.xml
+        - hdfs-site.xml
+        - mapred-site.xml
+        - yarn-site.xml
+      notify: restart hadoop services
+
+    - name: Distribute Spark configuration files
+      template:
+        src: "{{ item }}.j2"
+        dest: "/opt/spark/conf/{{ item }}"
+      with_items:
+        - spark-env.sh
+        - spark-defaults.conf
+      notify: restart spark services
+
+  handlers:
+    - name: restart hadoop services
+      command: echo "Hadoop services need restart"
+
+    - name: restart spark services
+      command: echo "Spark services need restart"
