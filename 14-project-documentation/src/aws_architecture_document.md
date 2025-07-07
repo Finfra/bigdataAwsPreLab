@@ -82,7 +82,7 @@ SageMaker (ML/AI Models)
 - **Amazon Athena**: 서버리스 SQL 쿼리 엔진
 - **AWS Glue**: 데이터 카탈로그, ETL, 크롤러
 - **Amazon QuickSight**: 비즈니스 인텔리전스 대시보드
-- **Amazon SageMaker**: 머신러닝 모델 학습/배포
+- **Amazon SageMaker**: 머신러닝 모델 실습/배포
 
 ### 2.5 모니터링 계층 (Monitoring Layer)
 ```

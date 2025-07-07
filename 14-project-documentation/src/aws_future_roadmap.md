@@ -981,7 +981,7 @@ class AutonomousOptimizer:
         return metrics
     
     def train_optimization_model(self, historical_data: List[Dict]):
-        """최적화 모델 학습"""
+        """최적화 모델 실습"""
         features = []
         targets = []
         
@@ -1000,7 +1000,7 @@ class AutonomousOptimizer:
             performance_score = self._calculate_performance_score(data_point)
             targets.append(performance_score)
         
-        # 모델 학습
+        # 모델 실습
         X = self.scaler.fit_transform(features)
         self.model = RandomForestRegressor(n_estimators=100, random_state=42)
         self.model.fit(X, targets)
@@ -1012,7 +1012,7 @@ class AutonomousOptimizer:
         current_metrics = self.collect_system_metrics()
         
         if not self.model:
-            print("모델이 학습되지 않음")
+            print("모델이 실습되지 않음")
             return
         
         # 현재 상태 예측

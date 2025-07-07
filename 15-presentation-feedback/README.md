@@ -22,7 +22,7 @@
   - CloudWatch 성능 메트릭 및 비용 분석
   - 트러블슈팅 사례 및 AWS 기술지원 활용
   - 온프레미스 vs 클라우드 성능 비교
-* **클라우드 학습 성과** (5분): 
+* **클라우드 실습 성과** (5분): 
   - AWS 기술 역량 성장 (자격증 취득 계획)
   - DevOps 및 Infrastructure as Code 경험
   - 클라우드 비용 최적화 노하우
@@ -148,7 +148,7 @@
   - **Lambda Cold Start**: Provisioned Concurrency로 지연시간 제거
   - **EMR 비용 급증**: Spot Instance Fleet으로 60% 절감
   - **Cross-AZ 비용**: VPC Endpoint로 데이터 전송 비용 제거
-* **학습 성과**: 
+* **클라우드 실습 성과**: 
   - **AWS 자격증**: Solutions Architect Associate 취득
   - **클라우드 네이티브**: 12-Factor App 설계 원칙 적용
   - **DevOps 문화**: 애자일 개발 + 지속적 배포
@@ -203,7 +203,7 @@
   - IoT 확장: IoT Core + Greengrass
   - 모바일 통합: Amplify + AppSync
 
-### 15.11 학습 가치 (클라우드 역량)
+### 15.11 실습 가치 (클라우드 역량)
 * **AWS 전문 기술**: 
   - **아키텍처**: Well-Architected 5개 기둥 마스터
   - **서비스 연동**: 20+ AWS 서비스 통합 경험

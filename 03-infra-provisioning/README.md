@@ -1,4 +1,4 @@
-# 3. 인프라 자동화(IaC)
+#  인프라 자동화(IaC)
 
 * 핵심 내용 : Terraform으로 EC2, VPC, SG, S3 등 자동 생성
 * 주요 산출물 : Terraform 코드, 인프라 다이어그램
@@ -9,6 +9,90 @@
 ## 개요
 
 이번 장에서는 IaC(Infrastructure as Code) 도구인 Terraform을 사용하여 AWS에 필요한 인프라를 자동으로 프로비저닝합니다. Terraform을 통해 콘솔 서버(Control Server)와 빅데이터 클러스터를 구성할 서버(s1, s2, s3)를 생성하고, 이들 간의 네트워크 통신을 설정합니다.
+
+
+## 1. 콘솔 인스턴스 프로비저닝
+* https://ap-northeast-2.console.aws.amazon.com/ec2/home?region=ap-northeast-2#LaunchInstances:
+* Region        : ap-northeast-2(서울) 인지 확인만.
+* Name          : i1
+* AMI           :  ami-0a463f27534bdf246 Amazon Linux 2023 
+* Ssecurity groups : Create security group ( Allow security group)
+* Instance Type : t2-micro
+* Key Pair      : key1 생성, pem확장자로 다운로드
+* Storage(EBS)  : 40G
+
+* 접속 : linux에서는 아래와 같고 windows에서는 putty로 접속 단, user는 ec2-user임.(ubuntu아님에 주의)
+```
+ssh -i key1.pem ec2-user@{아이피}
+```
+* 접속 후 기본 셋팅
+```
+sudo -i
+hostname i자기번호
+echo $(hostname) > /etc/hostname
+dnf install -y git 
+exit
+```
+
+## Ansible, Terraform설치
+```
+# cd
+# git clone  https://github.com/Finfra/awsHadoop.git
+cd awsHadoop/03-infra-provisioning
+bash installOnEc2_awsLinux.sh
+```
+
+## 2. 테라폼 셋팅
+* 아래와 같은 내용을 ~/.bashrc에 추가하고 실행해 줍니다.
+```
+echo '
+export TF_VAR_AWS_ACCESS_KEY="xxxxxxxxxx"
+export TF_VAR_AWS_SECRET_KEY="xxxxxxxxxxxxxxxxxxx"
+export TF_VAR_AWS_REGION="ap-northeast-2"
+'>> ~/.bashrc
+. ~/.bashrc
+```
+
+## 2. OS key 생성 [있으면 생략]
+```
+ssh-keygen -f ~/.ssh/id_rsa -N ''
+```
+* cf) 설치 대상 host에 Public-key 배포
+    ssh-copy-id root@10.0.2.10
+
+## 3. Terrform 으로 host 셋팅
+* Terraform으로 i1에서 s1,s2 s3 인스턴트 생성 : os는  Amazon Linux 2023 임.
+```
+# pwd
+# → /home/ec2-user/awsHadoop/3.HadoopEco
+
+terraform init
+terraform apply -var "user_num=$(hostname | sed 's/^i//')" -auto-approve
+```
+## 4. Hosts파일 셋팅
+```
+aws configure
+  # security setting
+    AWS Access Key ID [None]: xxxxxxxxxx
+    AWS Secret Access Key [None]: xxxxxxxxxxxxxxxxxxx
+    Default region name [None]: ap-northeast-2
+    Default output format [None]: text
+cd awsHadoop/5.Terraform/
+# rm -rf ~/.ssh/known_hosts
+bash doSetHosts.sh
+```
+
+* cf) 아래와 같이 /etc/hosts파일을 직접 셋팅 해도 됨
+```
+52.213.183.141 vm01
+54.75.118.15   vm02
+54.75.118.154  vm03
+```
+# 부록: Terraform 기반 인프라 자동화 예시 및 개념
+
+## 개요
+
+이 부록에서는 IaC(Infrastructure as Code) 도구인 Terraform을 사용하여 AWS에 필요한 인프라를 자동으로 프로비저닝하는 방법을 설명합니다. Terraform을 통해 콘솔 서버(Control Server)와 빅데이터 클러스터를 구성할 서버(s1, s2, s3)를 생성하고, 이들 간의 네트워크 통신을 실습할 수 있습니다.
 
 ## 주요 작업
 
@@ -24,25 +108,7 @@
     * `terraform plan`
     * `terraform apply`
 
-## 1. Terraform 설치
-
-먼저 로컬 환경에 Terraform을 설치합니다. 아래 공식 홈페이지에서 본인의 OS에 맞는 바이너리를 다운로드하고 PATH에 추가합니다.
-
-* **Terraform 다운로드:** [https://www.terraform.io/downloads.html](https://www.terraform.io/downloads.html)
-
-설치 후 `terraform version` 명령어로 설치를 확인합니다.
-
-## 2. Terraform 코드 작성
-
-`03-infra-provisioning/src` 디렉토리 아래에 다음과 같은 구조로 Terraform 코드를 작성합니다.
-
-```
-src/
-├── main.tf       # 주 설정 파일 (리소스 정의)
-├── variables.tf  # 변수 선언
-├── outputs.tf    # 결과 값 출력
-└── terraform.tfvars # 변수 값 할당 (Git에 포함하지 않도록 주의)
-```
+## Terraform 코드 예시
 
 ### `main.tf` (예시)
 
@@ -146,16 +212,6 @@ output "data_node_private_ips" {
 }
 ```
 
-## 3. Terraform 실행
+## 참고
 
-Terraform 코드 작성이 완료되면, `src` 디렉토리에서 다음 명령어를 순서대로 실행하여 인프라를 생성합니다.
-
-1. **`terraform init`**: Terraform 백엔드와 프로바이더 플러그인을 초기화합니다.
-2. **`terraform plan`**: 생성될 리소스의 실행 계획을 미리 확인합니다.
-3. **`terraform apply`**: 실행 계획에 따라 AWS에 리소스를 실제로 생성합니다. (중간에 `yes`를 입력해야 합니다.)
-
-`apply`가 완료되면 `outputs.tf`에 정의한 콘솔 서버의 Public IP와 데이터 노드들의 Private IP가 출력됩니다. 이 정보는 다음 장에서 Ansible을 설정할 때 사용됩니다.
-
-## 다음 과정
-
-다음 장에서는 프로비저닝된 콘솔 서버에 접속하여 Ansible을 설치하고, 생성된 s1, s2, s3 서버에 Hadoop과 Spark를 자동으로 설치 및 구성하는 방법을 학습합니다.
+- Terraform 공식 홈페이지: [https://www.terraform.io/downloads.html](https://www.terraform.io/downloads.html)

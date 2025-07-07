@@ -23,20 +23,61 @@ AWS 계정이 없는 경우, 아래 공식 가이드를 따라 계정을 생성�
 
 * **공식 가이드:** [새 AWS 계정 생성 및 활성화](https://docs.aws.amazon.com/ko_kr/accounts/latest/reference/create-account.html)
 
-## 2. IAM 사용자 생성
+## 2. Terraform 실습용 IAM 사용자 생성 및 권한 부여
 
-보안을 위해 Root 계정을 직접 사용하는 대신, 실습에 필요한 권한만 가진 IAM 사용자를 생성하여 사용하는 것이 좋습니다.
+Terraform 실습을 위해 별도의 IAM 사용자를 생성하고, 필요한 권한을 부여합니다. (개인 계정 사용자만 해당)
 
-1. AWS Management Console에 로그인 후 **IAM** 서비스로 이동합니다.
-2. 왼쪽 메뉴에서 **사용자**를 선택하고 **사용자 추가** 버튼을 클릭합니다.
-3. **사용자 이름**을 입력합니다. (예: `prelab-admin`)
-4. **액세스 유형**에서 **프로그래밍 방식 액세스**와 **AWS Management Console 액세스**를 모두 선택합니다.
-5. **다음: 권한**으로 이동하여 **기존 정책 직접 연결**을 선택하고 `AdministratorAccess` 정책을 연결합니다. (실습의 편의를 위해 관리자 권한을 부여하지만, 실제 운영 환경에서는 최소 권한 원칙을 따라야 합니다.)
-6. 태그 추가는 건너뛰고 **다음: 검토** 및 **사용자 만들기**를 클릭하여 사용자를 생성합니다.
+1. [IAM 서비스](https://us-east-1.console.aws.amazon.com/iamv2)에 접속합니다.
+2. 좌측 메뉴에서 **Users**를 선택하고, [Users 페이지](https://us-east-1.console.aws.amazon.com/iamv2/home#/users)로 이동합니다.
+3. 우측 상단의 **Create user** 버튼을 클릭합니다.
+4. **User name**에 `terraform` 등 원하는 이름을 입력하고 **다음**을 클릭합니다. (유저명은 자유롭게 지정 가능)
+5. **프로그래밍 방식 액세스**와 **AWS Management Console 액세스**를 모두 선택합니다.
+6. **Attach policies directly**를 선택한 뒤, `AdministratorAccess`와 `PowerUserAccess` 권한을 모두 추가합니다.
+7. **다음**을 눌러 사용자 생성을 완료합니다.
+8. 생성된 사용자를 선택하여 **Summary** 화면으로 이동한 뒤, **Security credentials** 탭을 클릭합니다.
+   - AWS 자격 증명 유형 선택에서 "액세스 키 (0)" 선택
 
-## 3. Access Key 발급
+> 실습 편의를 위해 관리자 권한을 부여하지만, 실제 운영 환경에서는 최소 권한 원칙을 반드시 준수해야 합니다.
 
-사용자 생성이 완료되면 **액세스 키 ID**와 **비밀 액세스 키**가 표시됩니다. 이 정보는 Terraform, AWS CLI 등에서 AWS API를 호출할 때 사용되므로, **반드시 `.csv` 파일을 다운로드**하거나 안전한 곳에 복사하여 보관해야 합니다. **이 화면을 벗어나면 비밀 액세스 키를 다시 확인할 수 없습니다.**
+## 3. Access Key 발급 및 AWS CLI 설정
+
+1. **Security credentials** 탭에서 **Create access key**를 클릭합니다.
+2. "Access key best practices & alternatives" 화면에서 **Command Line Interface (CLI)**를 선택하고, 확인 체크박스를 모두 클릭한 뒤 진행합니다.
+3. **Create access key** 버튼을 클릭하여 **Access Key ID**와 **Secret Access Key**를 발급받습니다.
+4. **Download .csv file**을 클릭하여 키 정보를 안전하게 저장합니다. (Secret Access Key는 이 화면을 벗어나면 다시 확인할 수 없으니 반드시 저장)
+5. [AWS CLI 설치 가이드](https://docs.aws.amazon.com/ko_kr/cli/latest/userguide/cli-chap-install.html)를 참고하여 AWS CLI를 설치합니다.
+6. 터미널에서 아래 명령어로 AWS CLI를 설정합니다.
+
+```bash
+python3 -m pip install awscli
+complete -C aws_completer aws
+
+aws configure
+# security setting
+AWS Access Key ID [None]: (발급받은 Access Key ID)
+AWS Secret Access Key [None]: (발급받은 Secret Access Key)
+Default region name [None]: ap-northeast-2
+Default output format [None]: text
+```
+
+7. 정상적으로 설정되었는지 아래 명령어로 확인합니다.
+
+```bash
+aws ec2 describe-instances
+```
+(실행 결과가 정상적으로 출력되면 설정 완료)
+
+> 참고: AWS CLI가 설치되어 있지 않은 경우, 아래와 같이 설치할 수 있습니다.  
+> (Ubuntu 예시)
+> 
+> ```bash
+> sudo -i
+> apt update
+> apt install -y python3-pip
+> python3 -m pip install --break-system-packages awscli
+> complete -C aws_completer aws
+> ```
+
 
 ## 4. S3 버킷 생성
 
@@ -77,9 +118,9 @@ Default output format [None]: json
 
 이제 `aws sts get-caller-identity` 명령을 실행하여 IAM 사용자 정보가 정상적으로 출력되는지 확인합니다.
 
-## 다음 과정
+## 다음 챕터
 
-다음 장에서는 Terraform을 사용하여 실습에 필요한 기본 인프라(VPC, Subnet, EC2 인스턴스 등)를 코드로 정의하고 프로비저닝하는 방법을 학습합니다.
+다음 장에서는 Terraform을 사용하여 실습에 필요한 기본 인프라(VPC, Subnet, EC2 인스턴스 등)를 코드로 정의하고 프로비저닝하는 방법을 실습합니다.
 
 ```bash
 $ aws sts get-caller-identity
@@ -90,6 +131,6 @@ $ aws sts get-caller-identity
 }
 ```
 
-## 다음 과정
+## 다음 챕터
 
-다음 장에서는 Terraform을 사용하여 실습에 필요한 기본 인프라(VPC, Subnet, EC2 인스턴스 등)를 코드로 정의하고 프로비저닝하는 방법을 학습합니다.
+다음 장에서는 Terraform을 사용하여 실습에 필요한 기본 인프라(VPC, Subnet, EC2 인스턴스 등)를 코드로 정의하고 프로비저닝하는 방법을 실습합니다.

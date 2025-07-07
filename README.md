@@ -31,7 +31,7 @@ AWS EC2 기반 빅데이터 실시간 처리 시스템 구축 실습 과정
 | 1   | 01-pre-lab-introduction/       | Pre-Lab 소개               | 프로젝트 목표, AWS 실습 환경 개요, 계정 준비                  | 환경 체크리스트                   |
 | 2   | 02-aws-account-setup/          | AWS 계정 및 권한 준비      | IAM, 키페어, S3 버킷, VPC 기본 설정                           | 계정/권한 체크리스트, S3 버킷     |
 | 3   | 03-infra-provisioning/         | 인프라 자동화(IaC)         | Terraform으로 EC2, VPC, SG, S3 등 자동 생성                   | Terraform 코드, 인프라 다이어그램 |
-| 4   | 04-ansible-automation/         | 서비스 자동화 배포         | Ansible로 Hadoop/Spark/Kafka 자동 설치                        | Ansible 플레이북, 배포 로그       |
+| 4   | 04-ansible-automation/         | 서비스 자동화 배포         | Ansible로 Hadoop/Spark 자동 설치                        | Ansible 플레이북, 배포 로그       |
 | 5   | 05-architecture-design/        | 아키텍처 설계 및 검토      | AWS 기반 분산 아키텍처 설계, 리스크 분석                      | 아키텍처 다이어그램, 리스크 분석  |
 | 6   | 06-hadoop-spark-cluster/       | Hadoop/Spark 클러스터 구축 | EC2 기반 분산 스토리지(저장소는 AWS S3 지정)/컴퓨팅 환경 구축 | 클러스터 구축 스크립트, 모니터링  |
 | 7   | 07-kafka-streaming/            | Kafka 실시간 스트리밍      | EC2 기반 Kafka 클러스터, 데이터 수집기                        | Kafka 클러스터, 데이터 수집기     |
@@ -237,6 +237,6 @@ bigdataAwsPreLab/
 
 ---
 
-> **🎯 학습 목표**: 이론과 실습을 통해 AWS 기반 빅데이터 실시간 처리 시스템의 완전한 구축 경험을 제공하며, 현업에서 바로 활용할 수 있는 실무 역량을 기릅니다.
+> **🎯 실습 목표**: 이론과 실습을 통해 AWS 기반 빅데이터 실시간 처리 시스템의 완전한 구축 경험을 제공하며, 현업에서 바로 활용할 수 있는 실무 역량을 기릅니다.
 
 **Happy Learning! 🚀**

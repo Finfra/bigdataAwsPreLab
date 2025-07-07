@@ -92,9 +92,9 @@
   - Prophet: Facebook 오픈소스 시계열 모델
   - ARIMA: 전통적 통계 모델
 * **이상탐지**: 
-  - Random Cut Forest: 비지도 학습 이상탐지
+  - Random Cut Forest: 비지도 실습 이상탐지
   - Isolation Forest: 아웃라이어 탐지
-  - One-Class SVM: 정상 패턴 학습
+  - One-Class SVM: 정상 패턴 실습
 * **분류 모델**: XGBoost, Random Forest로 장비 상태 분류
 
 ### 13.11 모델 배포 및 추론

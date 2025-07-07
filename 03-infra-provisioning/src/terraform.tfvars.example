@@ -1,0 +1,5 @@
+# terraform.tfvars.example
+# Copy this file to terraform.tfvars and update with your values
+
+aws_region = "ap-northeast-2"
+public_key_path = "~/.ssh/prelab-key.pub"  # Replace with your actual public key path

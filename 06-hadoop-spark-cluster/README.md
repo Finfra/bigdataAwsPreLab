@@ -8,7 +8,7 @@
 
 ## 개요
 
-이번 장에서는 Ansible Playbook을 구체화하여 s1, s2, s3 서버에 Hadoop과 Spark 클러스터를 완전하게 구축합니다. NameNode, DataNode, ResourceManager, NodeManager 등 각 데몬의 역할을 서버에 맞게 할당하고, 클러스터가 정상적으로 동작하는지 확인하는 과정을 다룹니다.
+이번 장에서는 Ansible Playbook을 구체화하여 s1, s2, s3 서버에 Hadoop과 Spark 클러스터를 완전하게 구축합니다. NameNode, DataNode, ResourceManager, NodeManager 등 각 데몬의 역할을 서버에 맞게 할당하고, 클러스터가 정상적으로 동작하는지 확인하는 과정을 실습합니다.
 
 ## 주요 작업
 
@@ -151,6 +151,6 @@ Ansible Playbook에 이 설정을 추가하는 Task를 구현합니다.
     ```
     * YARN 웹 UI의 애플리케이션 목록에서 작업이 성공적으로 완료되었는지 확인합니다.
 
-## 다음 과정
+## 다음 챕터
 
-다음 장에서는 실시간 데이터 스트리밍을 처리하기 위해 Kafka를 설치하고, Spark Streaming과 연동하여 간단한 스트리밍 파이프라인을 구축하는 방법을 학습합니다.
+다음 장에서는 실시간 데이터 스트리밍을 처리하기 위해 Kafka를 설치하고, Spark Streaming과 연동하여 간단한 스트리밍 파이프라인을 구축하는 방법을 실습합니다.
